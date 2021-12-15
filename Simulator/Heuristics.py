@@ -1,4 +1,4 @@
-from Utility.Point import Point
+from Simulator.Utility.Point import Point
 
 
 class Heuristics:

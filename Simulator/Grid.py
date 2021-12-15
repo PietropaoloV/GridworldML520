@@ -1,7 +1,7 @@
 from random import random
-from Entity.GridCell import GridCell
+from GridCell import GridCell
 
-from Utility.Point import Point
+from Point import Point
 
 
 class Grid:

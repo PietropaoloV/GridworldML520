@@ -1,4 +1,4 @@
-from Utility.Point import Point
+from Point import Point
 
 
 class GridCell:

@@ -1,8 +1,8 @@
 from random import randrange
-from Entity.Grid import Grid
-from Entity.GridWorldInfo import GridWorldInfo
-from Utility.Point import Point
-from Simulator.model import Model
+from Grid import Grid
+from Model import Model
+from Point import Point
+from GridWorldInfo import GridWorldInfo
 from numpy import ndarray
 import numpy as np
 
@@ -129,9 +129,9 @@ class Simulator():
 
 
 
-# if __name__ == '__main__':
-#     simulator = Simulator(100,100,20,Point(0,0),Point(99,99),'../unPaddedTestModel')
-#     print(simulator.grid)
-#     simulator.simulate()
-#     print(simulator.gridWorldInfo)
-    # print(simulator.gridWorldInfo.numBumps)
+if __name__ == '__main__':
+    simulator = Simulator(100,100,20,Point(0,0),Point(99,99),'../unPaddedTestModel')
+    print(simulator.grid)
+    simulator.simulate()
+    print(simulator.gridWorldInfo)
+    print(simulator.gridWorldInfo.numBumps)
