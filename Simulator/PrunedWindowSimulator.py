@@ -76,12 +76,13 @@ class Simulator():
             else:
                 nextPosition = (self.currentPosition[0], self.currentPosition[1] - 1)
 
-            if nextPosition[0] >= self.rowSize or nextPosition[1] >= self.colSize or nextPosition[
-                    0] < 0 or nextPosition[1] < 0:
+            if not self.inBounds(nextPosition[0],nextPosition[1]):
                 continue
             elif self.kb[nextPosition[0]][nextPosition[1]] == -1:
                 continue
             elif nextPosition in self.deadNodes:
+                continue
+            elif nextPosition == self.parent[self.currentPosition]: # try to nudge the model to not go back unless absolutely necessary
                 continue
             else:
                 break
@@ -112,8 +113,8 @@ class Simulator():
             self.kb[self.currentPosition[0]][self.currentPosition[1]] = 2
             neighbors = self.getFourNeighbors(self.currentPosition[0], self.currentPosition[1])
             for neighbor in neighbors:
-                if neighbor[0] < 0 or neighbor[1] < 0 or neighbor[
-                        1] >= self.rowSize or neighbor[1] >= self.colSize:
+
+                if not self.inBounds(neighbor[0],neighbor[1]):
                     continue
 
                 if self.grid[neighbor[0]][neighbor[1]] == 0:
