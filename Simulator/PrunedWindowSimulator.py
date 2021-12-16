@@ -34,7 +34,7 @@ class Simulator():
                 if rowCoord < 0 or colCoord < 0 or rowCoord >= self.rowSize or colCoord >= self.colSize:
                     windowRow.append(-1)
                 else:
-                    windowRow.append(self.grid[rowCoord][colCoord])
+                    windowRow.append(self.kb[rowCoord][colCoord])
             window.append(windowRow)
 
         return np.array(window)
