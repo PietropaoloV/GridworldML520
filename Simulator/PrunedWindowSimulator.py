@@ -38,6 +38,7 @@ class Simulator():
         self.stats['trajectoryLengths'] = np.array([])
         self.stats['knownBumps'] = np.array([])
         self.stats['knownOutOfBounds'] = np.array([])
+        self.stats['discardedGrids'] = np.array([])
 
     def generateWindow(self, windowSize):
         window = []
@@ -79,7 +80,7 @@ class Simulator():
 
     def predict(self, window):
         predictions = self.model.predict(np.reshape(window, (1, 11, 11)))[0]
-        print(predictions)
+        # print(predictions)
         nextPosition = None
         iterationCount = 0
 
@@ -126,12 +127,18 @@ class Simulator():
         else:
             return nextPosition
 
-    def NRuns(self,n):
-        for i in range(n):
-            self.OneRunOnRandomGrid(i) 
+    def NRuns(self, n, saveStats=False, filePath=''):
 
-    def saveStats(self,filePath):
-        np.save(str(len(self.stats['trajectoryLengths'])) + 'Runs' + os.path.join(filePath, str(datetime.now())), self.stats)
+        for i in range(n):
+            self.OneRunOnRandomGrid(i)
+            print('Grid No. : ', i + 1)
+            if saveStats:
+                self.saveStats(filePath)
+
+    def saveStats(self, filePath):
+        np.save(
+            os.path.join(filePath, str(datetime.now())) + '_' +
+            str(len(self.stats['trajectoryLengths'])) + 'Runs', self.stats)
 
     def OneRunOnRandomGrid(self, index: int = -1):
         if index == -1:
@@ -155,6 +162,7 @@ class Simulator():
         self.trajectoryLength = 0
         self.knownBumps = 0
         self.knownOutOfBounds = 0
+        discardGrid = False
 
         while self.currentPosition != goal:
 
@@ -185,16 +193,26 @@ class Simulator():
                 nextPosition = self.parent[self.currentPosition]
 
             self.visitedFromPoint[self.currentPosition].append(nextPosition)
+            if len(self.visitedFromPoint[self.currentPosition]) > 4:
+                discardGrid = True
+                break
             # assert len(self.visitedFromPoint[self.currentPosition]) < 5
             self.parent[nextPosition] = self.currentPosition
             self.kb[self.currentPosition[0]][self.currentPosition[1]] = 0
             self.kb[nextPosition[0]][nextPosition[1]] = 2
             self.currentPosition = nextPosition
-            print(self.currentPosition)
+            # print(self.currentPosition)
 
-        self.stats['trajectoryLengths'] = np.append(self.stats['trajectoryLengths'],self.trajectoryLength)
-        self.stats['knownBumps'] = np.append(self.stats['knownBumps'],self.knownBumps)
-        self.stats['knownOutOfBounds'] = np.append(self.stats['knownOutOfBounds'],self.knownOutOfBounds)
+        if discardGrid:
+            self.stats['discardedGrids'] = np.append(
+                self.stats['discardedGrids'], index)
+
+        self.stats['trajectoryLengths'] = np.append(
+            self.stats['trajectoryLengths'], self.trajectoryLength)
+        self.stats['knownBumps'] = np.append(self.stats['knownBumps'],
+                                             self.knownBumps)
+        self.stats['knownOutOfBounds'] = np.append(
+            self.stats['knownOutOfBounds'], self.knownOutOfBounds)
 
 
 if __name__ == '__main__':
@@ -208,7 +226,8 @@ if __name__ == '__main__':
 
     simulator = Simulator(pathToGridFile, modelFilePath)
     # simulator.OneRunOnRandomGrid()
-    simulator.NRuns(10)
-    simulator.saveStats(os.path.dirname(__file__))
+    simulator.NRuns(1000, True,
+                    os.path.join(os.path.dirname(__file__), 'statsDump'))
+    # simulator.saveStats(os.path.dirname(__file__))
     # print(simulator.trajectoryLengths)
     # print(simulator.deadNodes)
